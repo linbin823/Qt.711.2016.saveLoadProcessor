@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<config id="test v1.0">
+    <tmTokenManager id="test v1.0">
+        <tmPeer id="test v1.0"/>
+    </tmTokenManager>
+    <managerExample id="1">
+        <para1>12</para1>
+        <para2>sdsd</para2>
+        <para3>23.2314</para3>
+        <deviceExample id="0">
+            <para1>12</para1>
+            <para2>sdsd</para2>
+            <para3>23.2314</para3>
+        </deviceExample>
+        <deviceExample id="1">
+            <para1>12</para1>
+            <para2>sdsd</para2>
+            <para3>23.2314</para3>
+        </deviceExample>
+        <deviceExample id="2">
+            <para1>12</para1>
+            <para2>sdsd</para2>
+            <para3>23.2314</para3>
+        </deviceExample>
+        <deviceExample id="3">
+            <para1>12</para1>
+            <para2>sdsd</para2>
+            <para3>23.2314</para3>
+        </deviceExample>
+        <deviceExample id="4">
+            <para1>12</para1>
+            <para2>sdsd</para2>
+            <para3>23.2314</para3>
+        </deviceExample>
+        <deviceExample id="5">
+            <para1>12</para1>
+            <para2>sdsd</para2>
+            <para3>23.2314</para3>
+        </deviceExample>
+    </managerExample>
+</config>
