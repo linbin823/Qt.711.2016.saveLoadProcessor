@@ -11,7 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = loadSaveExample
 TEMPLATE = app
 
-include(..\..\src\loadSave\saveLoadProcessor.pri)
+include(..\..\lib\loadSave\saveLoadProcessor.pri)
 SOURCES +=  main.cpp\
             mainwindow.cpp \
             deviceexample.cpp \

@@ -1,5 +1,5 @@
 QT       += core xml xmlpatterns
-include(..\common\common.pri)
+include(..\..\..\Qt.711.2016.common\lib\common\common.pri)
 
 SOURCES +=  $$PWD\loadsaveprocessorxml.cpp \
 
@@ -8,3 +8,6 @@ HEADERS  += $$PWD\siloadsaveprocessor.h \
 
 INCLUDEPATH += $$PWD\
 
+DISTFILES += \
+    $$PWD\../../HISTORY.txt \
+    $$PWD\../../README.txt
