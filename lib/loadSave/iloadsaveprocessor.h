@@ -1,13 +1,13 @@
-﻿#ifndef SILOADSAVEPROCESSOR
-#define SILOADSAVEPROCESSOR
+﻿#ifndef ILOADSAVEPROCESSOR
+#define ILOADSAVEPROCESSOR
 
 #include <QObject>
 #include <QDebug>
 
-class siLoadSaveProcessor
+class iLoadSaveProcessor
 {
 public:
-    siLoadSaveProcessor(){}
+    iLoadSaveProcessor(){}
 
     //读写实例内的参数
     //参数1：读：传入参数的名称 写：传入参数的名称
@@ -34,5 +34,5 @@ public:
 
 
 
-#endif // SILOADSAVEPROCESSOR
+#endif // ILOADSAVEPROCESSOR
 

@@ -11,10 +11,10 @@
 #include <QDir>
 #include <QtXmlPatterns>
 #include <QFileInfo>
-#include "siloadsaveprocessor.h"
+#include "iloadsaveprocessor.h"
 #include "basedevice.h"
 
-class loadSaveProcessorXml :  public baseDevice, public siLoadSaveProcessor
+class loadSaveProcessorXml :  public baseDevice, public iLoadSaveProcessor
 {
     Q_OBJECT
 public:
@@ -89,8 +89,8 @@ public:
     QString getResXmlFilePath(void);
 
     //不实现siLoadSave
-    virtual int load(siLoadSaveProcessor *processor){return 0;}
-    virtual int save(siLoadSaveProcessor *processor){return 0;}
+    virtual int load(iLoadSaveProcessor *processor){return 0;}
+    virtual int save(iLoadSaveProcessor *processor){return 0;}
 
     virtual int transactionStart();
     virtual int transactionEnd();

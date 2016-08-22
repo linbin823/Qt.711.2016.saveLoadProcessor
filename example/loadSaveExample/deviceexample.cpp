@@ -9,7 +9,7 @@ deviceExample::deviceExample(QObject *parent):baseDevice(parent)
 }
 
 
-int deviceExample::load(siLoadSaveProcessor *processor){
+int deviceExample::load(iLoadSaveProcessor *processor){
     QString value;
     processor->loadParameters( QString("para1") , &value );
     para1 = value.toInt();
@@ -20,7 +20,7 @@ int deviceExample::load(siLoadSaveProcessor *processor){
     return 0;
 }
 
-int deviceExample::save(siLoadSaveProcessor *processor){
+int deviceExample::save(iLoadSaveProcessor *processor){
     processor->saveParameters( QString("para1"), QString::number( para1 ) );
     processor->saveParameters( QString("para2"), para2 );
     processor->saveParameters( QString("para3"), QString::number( para3 ) );

@@ -11,7 +11,7 @@ managerExample::managerExample(QObject *parent ):baseDevice(parent)
     para3 = 23.2314;
 }
 
-int managerExample::load(siLoadSaveProcessor *processor){
+int managerExample::load(iLoadSaveProcessor *processor){
     QString value;
     bool ok;
     processor->loadParameters( QString("para1") , &value );
@@ -33,7 +33,7 @@ int managerExample::load(siLoadSaveProcessor *processor){
 
 }
 
-int managerExample::save(siLoadSaveProcessor *processor){
+int managerExample::save(iLoadSaveProcessor *processor){
     //qDebug()<<"managerExample::save"<<QString("para1")<<QString::number( para1 );
     processor->saveParameters( QString("para1"), QString::number( para1 ) );
     processor->saveParameters( QString("para2"), para2 );

@@ -1,7 +1,7 @@
 ﻿#ifndef MANAGEREXAMPLE_H
 #define MANAGEREXAMPLE_H
 
-#include "siloadsaveprocessor.h"
+#include "iloadsaveprocessor.h"
 #include "basedevice.h"
 #include "deviceexample.h"
 
@@ -12,8 +12,8 @@ class managerExample: public baseDevice
 public:
     managerExample(QObject *parent = 0);
 
-    virtual int load(siLoadSaveProcessor *processor);
-    virtual int save(siLoadSaveProcessor *processor);
+    virtual int load(iLoadSaveProcessor *processor);
+    virtual int save(iLoadSaveProcessor *processor);
 
     virtual QString getStateString(int lang) const{return QString::null;}
 

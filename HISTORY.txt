@@ -1,6 +1,6 @@
-Qt.711.2016.saveLoadProcessor±£´æ/¶ÁÈ¡ ´¦ÀíÆ÷
+ï»¿Qt.711.2016.saveLoadProcessorä¿å­˜/è¯»å– å¤„ç†å™¨
 ---20160728-----
-v1.0 Éè¼Æµ÷ÊÔÍê³É
+v1.0 è®¾è®¡è°ƒè¯•å®Œæˆ
 
 -TODO-
 none

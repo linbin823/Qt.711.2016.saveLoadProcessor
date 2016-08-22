@@ -1,7 +1,7 @@
 ﻿#ifndef DEVICEEXAMPLE_H
 #define DEVICEEXAMPLE_H
 
-#include "siloadsaveprocessor.h"
+#include "iloadsaveprocessor.h"
 #include "basedevice.h"
 
 class deviceExample : public baseDevice
@@ -10,8 +10,8 @@ public:
     deviceExample(QObject *parent = 0);
 
 
-    virtual int load(siLoadSaveProcessor *processor);
-    virtual int save(siLoadSaveProcessor *processor);
+    virtual int load(iLoadSaveProcessor *processor);
+    virtual int save(iLoadSaveProcessor *processor);
 
     virtual QString getStateString(int lang) const{return QString::null;}
 
