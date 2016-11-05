@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QFileDialog>
 #include "loadsaveprocessorxml.h"
+#include "loadsaveprocessorjson.h"
 #include "managerexample.h"
 
 namespace Ui {
@@ -26,7 +27,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    loadSaveProcessorXml* processor;
+    loadSaveProcessorJson* processor;
     managerExample* manager;
 
 };

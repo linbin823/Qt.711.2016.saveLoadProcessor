@@ -23,7 +23,7 @@ int managerExample::load(iLoadSaveProcessor *processor){
     para3 = value.toFloat( &ok );
     //qDebug()<<value<<para3;
 
-    for(int i=0; i<=10; i++){
+    for(int i=0; i<=5; i++){
         int ret = processor->moveToInstance( QString("deviceExample") , QString::number( i ) );
         if(ret != 0) continue;
         pDeviceList.at(i)->load( processor );
@@ -38,11 +38,14 @@ int managerExample::save(iLoadSaveProcessor *processor){
     processor->saveParameters( QString("para1"), QString::number( para1 ) );
     processor->saveParameters( QString("para2"), para2 );
     processor->saveParameters( QString("para3"), QString::number( para3 ) );
-
+    int ret;
     for(int i=0; i<=5; i++){
-        processor->createNewInstance( QString("deviceExample") , QString::number( i ) );
-        processor->moveToInstance( QString("deviceExample") , QString::number( i ) );
-        pDeviceList.at(i)->save( processor );
+        ret = processor->createNewInstance( QString("deviceExample") , QString::number( i ) );
+        if(ret < 0) continue;
+        ret = processor->moveToInstance(    QString("deviceExample") , QString::number( i ) );
+        if(ret < 0) continue;
+        ret = pDeviceList.at(i)->save( processor );
+        if(ret < 0) continue;
         processor->moveBackToParent();
     }
     return 0;

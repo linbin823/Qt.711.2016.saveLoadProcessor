@@ -1,20 +1,29 @@
-﻿#include "loadSaveProcessorXml.h"
+﻿#if _MSC_VER >= 1600
+#pragma execution_character_set("utf-8")
+#endif
+
+#include "loadsaveprocessorxml.h"
 
 /*
  * 构造函数
- * 输入参数：父QObject
+ * 输入参数：
+ * 1、父QObject
+ * 2、是否需要AES加密
  * 返回数值：无
  * 功能描述：
  * 1、进入Initialization状态，初始化内部变量
- * 2、读取本地xml文件
- * 3、如果读取正确，进入Ready状态
+ * 2、初始化本地xml文件
+ * 3、进入Ready状态
  */
-loadSaveProcessorXml::loadSaveProcessorXml(QObject *parent):baseDevice(parent)
+loadSaveProcessorXml::loadSaveProcessorXml(QObject *parent, bool encrypt):baseDevice(parent)
 {
-    //qDebug()<<"loadSaveProcessorXml::loadSaveProcessorXml";
+    _password = QString("fusion");
+    _salt = QString("fusion");
+    _aes = new QAesWrap(_password.toUtf8(), _salt.toUtf8(), QAesWrap::AES_256);
+    _needEncrypt = encrypt;
+
     setState( stateReady );
     setResXmlFilePath( QString(QCoreApplication::applicationDirPath() + "/configuration.xml"));
-    readXmlFile();
 }
 
 /*
@@ -24,7 +33,7 @@ loadSaveProcessorXml::loadSaveProcessorXml(QObject *parent):baseDevice(parent)
  * 功能描述：
  */
 loadSaveProcessorXml::~loadSaveProcessorXml(){
-
+    delete _aes;
 }
 
 /*
@@ -81,13 +90,13 @@ int loadSaveProcessorXml::saveParameters(QString &paraName, QString &paraValue){
             temp.childNodes().at(0).toText().setNodeValue( paraValue );
             return 0;//找到了
         }
-        QDomText newOne = resXml.createTextNode( paraValue );
+        QDomText newOne = _resXml.createTextNode( paraValue );
         temp.appendChild( newOne );
         return 0;
     }
     else if(ret == -2){
-        QDomElement newElement  = resXml.createElement( paraName );
-        QDomText    newOne      = resXml.createTextNode( paraValue );
+        QDomElement newElement  = _resXml.createElement( paraName );
+        QDomText    newOne      = _resXml.createTextNode( paraValue );
         newElement.appendChild( newOne );
         getParent().appendChild( newElement );
         return 0;
@@ -178,39 +187,22 @@ int loadSaveProcessorXml::initXmlFile(){
     quint64 lastState = getState();
     setState( stateWriteFile );//进入指定写入文件模式
 
-    QFile file(resXmlFilePathWithoutProtocol);
-    if(!file.open(QIODevice::WriteOnly | QIODevice::Text)){
-        //qDebug()<<"xml file open failed!\n"<<file.errorString();
-        setError( errorFileOpenFail );
-        file.close();
-        return -1;
-    }
-
-    resXml.clear();
+    _resXml.clear();
 
     QString strHeader( "version=\"1.0\" encoding=\"UTF-8\"" );
-    resXml.appendChild( resXml.createProcessingInstruction("xml", strHeader) );
+    _resXml.appendChild( _resXml.createProcessingInstruction("xml", strHeader) );
 
-    QDomElement rootElement = resXml.createElement( "config" );
+    QDomElement rootElement = _resXml.createElement( "config" );
     rootElement.setAttribute( "id", "test v1.0" );
-    resXml.appendChild( rootElement );
+    _resXml.appendChild( rootElement );
 
-//    QDomElement tmTokenManager = resXml.createElement( "tmTokenManager" );
-//    tmTokenManager.setAttribute( "id", "test v1.0" );
-//    rootElement.appendChild( tmTokenManager );
-
-//    QDomElement tmPeer = resXml.createElement( "tmPeer" );
-//    tmPeer.setAttribute( "id", "test v1.0" );
-//    tmTokenManager.appendChild( tmPeer );
-
-    QTextStream out( &file );
-    resXml.save( out, 4 );//4是子项目缩进长度
-    file.close();
-
-    emit resXmlRefresh();
+    int ret = writeXmlFile();
     setState( lastState );//进入上个模式
 
-    return 0;
+    emit resXmlRefresh();
+
+    return ret;
+
 }
 /*
  * 读取xml文件
@@ -228,7 +220,7 @@ int loadSaveProcessorXml::readXmlFile(){
     setState( stateReadFile );//进入读取文件模式
     //qDebug()<<"loadSaveProcessorXml::readXmlFile"<<lastState;
 
-    QFile file(resXmlFilePathWithoutProtocol);
+    QFile file(_resXmlFilePathWithoutProtocol);
     if( !file.exists()) {
         setError( errorFileNotFound );
         if (initXmlFile() != 0){
@@ -238,7 +230,7 @@ int loadSaveProcessorXml::readXmlFile(){
             return -1;
         }
     }
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+    if(!file.open(QIODevice::ReadOnly)){
         //qDebug()<<"loadSaveProcessorXml::readXmlFile"<<"xml file open failed!\n"<<file.errorString();
         setError( errorFileOpenFail );
         file.close();
@@ -246,25 +238,36 @@ int loadSaveProcessorXml::readXmlFile(){
         return -1;
     }
 
-    QTextStream check(&file);
-    QString strCheck = check.readLine();
-    //qDebug()<<"loadSaveProcessorXml::readXmlFile"<<strCheck.mid(30,5);
-    if( strCheck.mid(30,5) != "UTF-8" || strCheck.mid(15,3)!= "1.0" ){
-        //qDebug()<<"loadSaveProcessorXml::readXmlFile"<<"xml file read error!";
+    QByteArray orientalBytes = file.readAll();
+//    QDataStream data(&file);
+//    char* buffer = (char*)malloc(file.size() * sizeof(char) );
+//    data.readRawData(buffer, file.size() );
+//    QByteArray orientalBytes = QByteArray(buffer, file.size() );
+//    delete buffer;
+    file.close();
+
+    bool ok;
+    if(_needEncrypt){
+        QByteArray decrypedBytes = _aes->decrypt(orientalBytes,QAesWrap::AES_ECB);
+        //qDebug()<<"loadSaveProcessorXml::readXmlFile"<<orientalBytes<<"||"<<decrypedBytes;
+        //qDebug()<<orientalBytes.length()<<decrypedBytes.length();
+        ok = _resXml.setContent(decrypedBytes);
+    }
+    else{
+        ok = _resXml.setContent(orientalBytes);
+    }
+    if(!ok){
         setError( errorFlieFomatWrong );
         file.close();
         setState( stateNotReady );//进入停止模式
         return -2;
     }
-    file.close();
-    file.open(QIODevice::ReadOnly | QIODevice::Text);
-    //qDebug()<<"loadSaveProcessorXml::readXmlFile"<<file.bytesAvailable();
-    resXml.setContent(&file);
+
     //qDebug()<<"loadSaveProcessorXml::readXmlFile"<<resXml.firstChildElement().nodeName();
-    domElementParentList.clear();
-    domElementParentList.append( resXml.firstChildElement() );
+    _domElementParentList.clear();
+    _domElementParentList.append( _resXml.firstChildElement() );
     //qDebug()<<domElementParentList.at(0).toElement().nodeName();
-    file.close();
+    emit resXmlRefresh();
     setState( lastState );//进入上个模式
     return 0;
 }
@@ -283,8 +286,8 @@ int loadSaveProcessorXml::writeXmlFile(){
     quint64 lastState = getState();
     setState( stateWriteFile );//进入写文件模式
 
-    QFile file(resXmlFilePathWithoutProtocol);
-    if( !file.open(QIODevice::WriteOnly | QIODevice::Text) )
+    QFile file(_resXmlFilePathWithoutProtocol);
+    if( !file.open(QIODevice::WriteOnly) )
     {
         setError( errorFileWriteFail );
         //qDebug()<<"xml file write error!";
@@ -292,8 +295,22 @@ int loadSaveProcessorXml::writeXmlFile(){
         return -1;
     }
 
-    QTextStream out( &file );
-    resXml.save( out, 4 );//4是子项目缩进长度
+    QByteArray orientalBytes;
+    QTextStream out( &orientalBytes );
+    out.setCodec("UTF-8");
+    _resXml.save(out,4,QDomNode::EncodingFromTextStream);//4是子项目缩进长度
+
+    if(_needEncrypt){
+        QByteArray encrypedBytes = _aes->encrypt(orientalBytes,QAesWrap::AES_ECB);
+        //qDebug()<<"loadSaveProcessorXml::writeXmlFile"<<orientalBytes<<"||"<<encrypedBytes<<orientalBytes.size()<<encrypedBytes.size();
+        //qDebug()<<_aes->decrypt(encrypedBytes, QAesWrap::AES_ECB);
+        file.write( encrypedBytes, encrypedBytes.length());
+    }
+    else{
+        file.write( orientalBytes.data(), orientalBytes.length());
+    }
+
+
     file.close();
 
     emit resXmlRefresh();
@@ -313,7 +330,7 @@ int loadSaveProcessorXml::writeXmlFile(){
  * 功能描述：
  */
 int loadSaveProcessorXml::getElement(QDomElement& res, QString tagName, QString id){
-    if (domElementParentList.size() ==0 || resXml.isNull() ){
+    if (_domElementParentList.size() ==0 || _resXml.isNull() ){
         res = getParent();
         return -1;
     }
@@ -349,7 +366,7 @@ int loadSaveProcessorXml::getElement(QDomElement& res, QString tagName, QString 
  * 4、元素id可以不指定，此时返回tagName相同的第一个元素
  */
 int loadSaveProcessorXml::setElement(QDomElement& res, QString tagName, QString id){
-    if (domElementParentList.size() == 0 || resXml.isNull() ){
+    if (_domElementParentList.size() == 0 || _resXml.isNull() ){
         res = getParent();
         return -1;
     }
@@ -366,7 +383,7 @@ int loadSaveProcessorXml::setElement(QDomElement& res, QString tagName, QString 
             }
         }
     }
-    res = resXml.createElement( tagName );
+    res = _resXml.createElement( tagName );
     if( !id.isNull() ){
         res.setAttribute( "id", id );
     }
@@ -388,10 +405,10 @@ void loadSaveProcessorXml::setResXmlFilePath(const QString &name){
 //        setError( errorFileNameError );
 //        return;
 //    }
-    resXmlFilePathWithoutProtocol = QDir::toNativeSeparators(name);
-    resXmlFilePath = QDir::toNativeSeparators( "file:" + name );
-    //qDebug()<<resXmlFilePath;
-    //qDebug()<<resXmlFilePathWithoutProtocol;
+    _resXmlFilePathWithoutProtocol = QDir::toNativeSeparators(name);
+    _resXmlFilePath = QDir::toNativeSeparators( "file:" + name );
+    //qDebug()<<_resXmlFilePath;
+    //qDebug()<<_resXmlFilePathWithoutProtocol;
     emit resXmlFilePathChanged();
 }
 
@@ -403,7 +420,7 @@ void loadSaveProcessorXml::setResXmlFilePath(const QString &name){
  * 1、返回有协议文件路径，for QML
  */
 QString loadSaveProcessorXml::getResXmlFilePath(void){
-    return resXmlFilePath;
+    return _resXmlFilePath;
 }
 /*
  * 读取xml文件
@@ -450,8 +467,8 @@ int loadSaveProcessorXml::saveFile(QString fileName){
 int loadSaveProcessorXml::transactionStart(){
     if(getState() != stateReady) return -1;
     setState( stateOccupied );
-    domElementParentList.clear();
-    domElementParentList.append( resXml.firstChildElement() );
+    _domElementParentList.clear();
+    _domElementParentList.append( _resXml.firstChildElement() );
     return 0;
 }
 /*

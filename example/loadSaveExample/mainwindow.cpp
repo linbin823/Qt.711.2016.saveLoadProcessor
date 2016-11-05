@@ -6,7 +6,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    processor = new loadSaveProcessorXml(this);
+    processor = new loadSaveProcessorJson(this,false);
     manager = new managerExample(this);
 
     connect(processor,SIGNAL(msgStateChanged(quint64)),this,SLOT(setState(quint64)));
@@ -23,23 +23,19 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_clicked()
 {
+    QString ret = QFileDialog::getSaveFileName(this, tr("Save File"),
+                                               QDir::currentPath(),
+                                               tr("config Fille (*.*)"));
+    if(ret == QString::null) return;
     if( processor->transactionStart() )
         return;
-    //qDebug()<<"MainWindow::on_pushButton_clicked 1";
+
     processor->createNewInstance( QString("managerExample"), QString::number( 1 ) );
-    //qDebug()<<"MainWindow::on_pushButton_clicked 2";
     processor->moveToInstance(    QString("managerExample"), QString::number( 1 ) );
-    //qDebug()<<"MainWindow::on_pushButton_clicked 3";
     manager->save(processor);
-    //qDebug()<<"MainWindow::on_pushButton_clicked 4";
     processor->moveBackToParent();
-    //qDebug()<<"MainWindow::on_pushButton_clicked 5";
-    processor->saveFile( QFileDialog::getSaveFileName(this, tr("Save File"),
-                                                      QDir::currentPath(),
-                                                      tr("xml Fille (*.xml)")) );
-    //qDebug()<<"MainWindow::on_pushButton_clicked 6";
+    processor->saveFile( ret );
     processor->transactionEnd();
-    //qDebug()<<"MainWindow::on_pushButton_clicked 7";
 
     updateDisplay();
 }
@@ -51,20 +47,18 @@ void MainWindow::setState(quint64 state){
 
 void MainWindow::on_PB_load_clicked()
 {
+
+    QString ret = QFileDialog::getOpenFileName(this, tr("Load File"),
+                                               QDir::currentPath(),
+                                               tr("config Fille (*.*)"));
+    if(ret == QString::null) return;
     if( processor->transactionStart() )
         return;
-    processor->loadFile( QFileDialog::getOpenFileName(this, tr("Load File"),
-                                                      QDir::currentPath(),
-                                                      tr("xml Fille (*.xml)"))  );
-    //qDebug()<<"MainWindow::on_PB_load_clicked 1";
+    processor->loadFile( ret );
     processor->moveToInstance( QString("managerExample"), QString::number( 1 ) );
-    //qDebug()<<"MainWindow::on_PB_load_clicked 2";
     manager->load( processor );
-    //qDebug()<<"MainWindow::on_PB_load_clicked 3";
     processor->moveBackToParent();
-    //qDebug()<<"MainWindow::on_PB_load_clicked 4";
     processor->transactionEnd();
-    //qDebug()<<"MainWindow::on_PB_load_clicked 5";
     updateDisplay();
 }
 

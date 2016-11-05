@@ -1,0 +1,6 @@
+[submodule "lib/common"]
+	path = lib/common
+	url = https://github.com/linbin823/Qt.711.2016.common.git
+[submodule "lib/QAes"]
+	path = lib/QAes
+	url = https://github.com/dushibaiyu/QAes.git

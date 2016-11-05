@@ -21,8 +21,11 @@ int deviceExample::load(iLoadSaveProcessor *processor){
 }
 
 int deviceExample::save(iLoadSaveProcessor *processor){
-    processor->saveParameters( QString("para1"), QString::number( para1 ) );
-    processor->saveParameters( QString("para2"), para2 );
-    processor->saveParameters( QString("para3"), QString::number( para3 ) );
+    int ret;
+    ret = processor->saveParameters( QString("para1"), QString::number( para1 ) );
+    if(ret < 0) return -1;
+    ret = processor->saveParameters( QString("para2"), para2 );
+    if(ret < 0) return -1;
+    ret = processor->saveParameters( QString("para3"), QString::number( para3 ) );
     return 0;
 }
