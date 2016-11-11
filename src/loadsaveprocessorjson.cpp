@@ -57,7 +57,7 @@ loadSaveProcessorJson::~loadSaveProcessorJson()
  * 2、读取当前parent位置下的指定paraName的paraValue
  * 3、找不到的话paraValue = null，返回-2
  */
-int loadSaveProcessorJson::loadParameters(QString paraName, QString *paraValue){
+int loadSaveProcessorJson::loadParameters(const QString &paraName, QString *paraValue){
     if(getState() != stateOccupied ){
         *paraValue = QString::null;
         return -1;
@@ -85,7 +85,7 @@ int loadSaveProcessorJson::loadParameters(QString paraName, QString *paraValue){
  * 2、把的paraName和paraValue保存到当前parent位置下
  * 3、若参数存在，则覆盖。若不存在，则新建
  */
-int loadSaveProcessorJson::saveParameters(QString paraName, QString paraValue){
+int loadSaveProcessorJson::saveParameters(const QString &paraName, const QString &paraValue){
     if(getState() != stateOccupied ){
         return -1;
     }
@@ -103,7 +103,7 @@ int loadSaveProcessorJson::saveParameters(QString paraName, QString paraValue){
  * 功能描述：
  * 1、子实例读取流程：a、移动到实例（MoveToInstance） b、读取参数（loadParameters） c、返回父实例（MoveBackToParent）
  */
-int loadSaveProcessorJson::moveToInstance(QString ObjType, QString InstID){
+int loadSaveProcessorJson::moveToInstance(const QString& ObjType, const QString& InstID){
     if(getState() != stateOccupied ){
         return -1;
     }
@@ -124,7 +124,7 @@ int loadSaveProcessorJson::moveToInstance(QString ObjType, QString InstID){
  * 功能描述：
  * 1、子实例写入流程：a、创建新实例（CreateNewInstance）b、移动到实例（MoveToInstance） c、写入参数（saveParameters） d、返回父实例（MoveBackToParent）
  */
-int loadSaveProcessorJson::createNewInstance(QString ObjType, QString InstID){
+int loadSaveProcessorJson::createNewInstance(const QString &ObjType, const QString &InstID){
     if(getState() != stateOccupied ){
         return -1;
     }
@@ -231,7 +231,7 @@ int loadSaveProcessorJson::transactionEnd(){
  * 1、实施保存工作流程：a、启动事务(transactionStart) b、顶层实例顺序调用每个子实例的保存函数 c、子实例顺序调更下级的子实例保存函数 d、所有保存完毕后，顶层实例调用保存文件（saveFile） e、结束事务（transactionEnd）
  * 2、实施读取工作流程：a、启动事务(transactionStart) b、顶层实例调用读取文件（loadFile），可以是默认文件，也可以指定文件 c、顶层实例顺序调用每个子实例的读取函数 d、子实例顺序调更下级的子实例读取函数  e、结束事务（transactionEnd）
  */
-int loadSaveProcessorJson::loadFile(QString fileName){
+int loadSaveProcessorJson::loadFile(const QString &fileName){
     if(getState() != stateOccupied ){
         return -1;
     }
@@ -251,7 +251,7 @@ int loadSaveProcessorJson::loadFile(QString fileName){
  * 1、实施保存工作流程：a、启动事务(transactionStart) b、顶层实例顺序调用每个子实例的保存函数 c、子实例顺序调更下级的子实例保存函数 d、所有保存完毕后，顶层实例调用保存文件（saveFile） e、结束事务（transactionEnd）
  * 2、实施读取工作流程：a、启动事务(transactionStart) b、顶层实例调用读取文件（loadFile），可以是默认文件，也可以指定文件 c、顶层实例顺序调用每个子实例的读取函数 d、子实例顺序调更下级的子实例读取函数  e、结束事务（transactionEnd）
  */
-int loadSaveProcessorJson::saveFile(QString fileName){
+int loadSaveProcessorJson::saveFile(const QString &fileName){
     if(getState() != stateOccupied ){
         return -1;
     }

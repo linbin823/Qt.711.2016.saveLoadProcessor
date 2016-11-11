@@ -48,7 +48,7 @@ loadSaveProcessorXml::~loadSaveProcessorXml(){
  * 2、读取当前parent位置下的指定paraName的paraValue
  * 3、找不到的话paraValue = -1，返回-2
  */
-int loadSaveProcessorXml::loadParameters(QString & paraName, QString * paraValue){
+int loadSaveProcessorXml::loadParameters(const QString& paraName, QString * paraValue){
     if(getState() != stateOccupied ){
         *paraValue = QString::null;
         return -1;
@@ -77,7 +77,7 @@ int loadSaveProcessorXml::loadParameters(QString & paraName, QString * paraValue
  * 2、把的paraName和paraValue保存到当前parent位置下
  * 3、若参数存在，则覆盖。若不存在，则新建
  */
-int loadSaveProcessorXml::saveParameters(QString &paraName, QString &paraValue){
+int loadSaveProcessorXml::saveParameters(const QString &paraName, const QString &paraValue){
     if(getState() != stateOccupied ){
         return -1;
     }
@@ -114,7 +114,7 @@ int loadSaveProcessorXml::saveParameters(QString &paraName, QString &paraValue){
  * 功能描述：
  * 1、子实例读取流程：a、移动到实例（MoveToInstance） b、读取参数（loadParameters） c、返回父实例（MoveBackToParent）
  */
-int loadSaveProcessorXml::moveToInstance(QString &ObjType, QString &index){
+int loadSaveProcessorXml::moveToInstance(const QString &ObjType, const QString &index){
     if(getState() != stateOccupied ){
         return -1;
     }
@@ -144,7 +144,7 @@ int loadSaveProcessorXml::moveToInstance(QString &ObjType, QString &index){
  * 功能描述：
  * 1、子实例写入流程：a、创建新实例（CreateNewInstance）b、移动到实例（MoveToInstance） c、写入参数（saveParameters） d、返回父实例（MoveBackToParent）
  */
-int loadSaveProcessorXml::createNewInstance(QString &ObjType, QString &InstID){
+int loadSaveProcessorXml::createNewInstance(const QString &ObjType, const QString &InstID){
     if(getState() != stateOccupied ){
         return -1;
     }
@@ -419,7 +419,7 @@ void loadSaveProcessorXml::setResXmlFilePath(const QString &name){
  * 功能描述：
  * 1、返回有协议文件路径，for QML
  */
-QString loadSaveProcessorXml::getResXmlFilePath(void){
+QString loadSaveProcessorXml::getResXmlFilePath(void) const{
     return _resXmlFilePath;
 }
 /*
@@ -431,7 +431,7 @@ QString loadSaveProcessorXml::getResXmlFilePath(void){
  * 1、实施保存工作流程：a、启动事务(transactionStart) b、顶层实例顺序调用每个子实例的保存函数 c、子实例顺序调更下级的子实例保存函数 d、所有保存完毕后，顶层实例调用保存文件（saveFile） e、结束事务（transactionEnd）
  * 2、实施读取工作流程：a、启动事务(transactionStart) b、顶层实例调用读取文件（loadFile），可以是默认文件，也可以指定文件 c、顶层实例顺序调用每个子实例的读取函数 d、子实例顺序调更下级的子实例读取函数  e、结束事务（transactionEnd）
  */
-int loadSaveProcessorXml::loadFile(QString fileName){
+int loadSaveProcessorXml::loadFile(const QString& fileName){
     if(fileName != NULL){
         setResXmlFilePath( fileName );
     }
@@ -448,7 +448,7 @@ int loadSaveProcessorXml::loadFile(QString fileName){
  * 1、实施保存工作流程：a、启动事务(transactionStart) b、顶层实例顺序调用每个子实例的保存函数 c、子实例顺序调更下级的子实例保存函数 d、所有保存完毕后，顶层实例调用保存文件（saveFile） e、结束事务（transactionEnd）
  * 2、实施读取工作流程：a、启动事务(transactionStart) b、顶层实例调用读取文件（loadFile），可以是默认文件，也可以指定文件 c、顶层实例顺序调用每个子实例的读取函数 d、子实例顺序调更下级的子实例读取函数  e、结束事务（transactionEnd）
  */
-int loadSaveProcessorXml::saveFile(QString fileName){
+int loadSaveProcessorXml::saveFile(const QString& fileName){
     if(fileName != NULL){
         setResXmlFilePath( fileName );
     }

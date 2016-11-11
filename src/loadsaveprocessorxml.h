@@ -36,17 +36,17 @@ public:
         case langCHN:
             switch(getState()){
             case stateNotReady:
-                return QString("Save&Load处理器未就绪");
+                return tr("Save&Load处理器未就绪");
             case stateReady:
-                return QString("Save&Load处理器就绪");
+                return tr("Save&Load处理器就绪");
             case stateOccupied:
-                return QString("Save&Load处理器占用中");
+                return tr("Save&Load处理器占用中");
             case stateReadFile:
-                return QString("Save&Load处理器正在读文件");
+                return tr("Save&Load处理器正在读文件");
             case stateWriteFile:
-                return QString("Save&Load处理器正在写文件");
+                return tr("Save&Load处理器正在写文件");
             default:
-                return QString("数据错误");
+                return tr("数据错误");
             }
         case langEN:
             switch(getState()){
@@ -82,21 +82,21 @@ protected:
         case langCHN:
             switch(errorCode){
                 case errorFlieFomatWrong:
-                    return QString("xml文件格式错误");
+                    return tr("xml文件格式错误");
                 case errorFileNotFound:
-                    return QString("xml文件找不到，新建");
+                    return tr("xml文件找不到，新建");
                 case errorFileOpenFail:
-                    return QString("xml文件打开失败");
+                    return tr("xml文件打开失败");
                 case errorFileWriteFail:
-                    return QString("xml文件写入失败");
+                    return tr("xml文件写入失败");
                 case errorLoadFail:
-                    return QString("读取时遇到错误");
+                    return tr("读取时遇到错误");
                 case errorSaveFail:
-                    return QString("保存时遇到错误");
+                    return tr("保存时遇到错误");
                 case errorFileNameError:
-                    return QString("xml文件名称错误");
+                    return tr("xml文件名称错误");
                 default:
-                    return QString("数据错误");
+                    return tr("数据错误");
             }
         case langEN:
             switch(errorCode){
@@ -124,14 +124,14 @@ protected:
 
 public:
 
-    virtual int loadParameters(QString & paraName, QString *paraValue);
-    virtual int saveParameters(QString & paraName, QString & paraValue);
-    virtual int moveToInstance(QString & ObjType, QString & index);
-    virtual int createNewInstance(QString & ObjType, QString & InstID);
+    virtual int loadParameters(const QString& paraName, QString *paraValue);
+    virtual int saveParameters(const QString& paraName, const QString & paraValue);
+    virtual int moveToInstance(const QString& ObjType, const QString &index);
+    virtual int createNewInstance(const QString & ObjType, const QString & InstID);
     virtual int moveBackToParent();
 
     void    setResXmlFilePath(const QString &name);
-    QString getResXmlFilePath(void);
+    QString getResXmlFilePath(void) const;
 
     //不实现iLoadSave
     virtual int load(iLoadSaveProcessor *processor){return 0;}
@@ -139,9 +139,9 @@ public:
 
     virtual int transactionStart();
     virtual int transactionEnd();
-    virtual int loadFile(QString fileName = NULL);
-    virtual int saveFile(QString fileName = NULL);
-    inline void setPassWord(QString pswd){
+    virtual int loadFile(const QString& fileName = NULL);
+    virtual int saveFile(const QString& fileName = NULL);
+    inline void setPassWord(const QString& pswd){
         _password = pswd;
         delete _aes;
         _aes = new QAesWrap(_password.toUtf8(), _salt.toUtf8(), QAesWrap::AES_256);
