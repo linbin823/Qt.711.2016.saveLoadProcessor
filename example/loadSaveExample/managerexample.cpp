@@ -15,7 +15,7 @@ int managerExample::load(iLoadSaveProcessor *processor){
     QString value;
     bool ok;
     processor->loadParameters( QString("para1") , &value );
-    para1 = value.toInt( &ok, 10);
+    para1 = value.toInt( &ok);
     //qDebug()<<value<<para1<<ok;
     processor->loadParameters( QString("para2") , &value );
     para2 = value;

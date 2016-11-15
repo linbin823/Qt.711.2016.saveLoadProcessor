@@ -130,8 +130,6 @@ public:
     virtual int createNewInstance(const QString & ObjType, const QString & InstID);
     virtual int moveBackToParent();
 
-    void    setResXmlFilePath(const QString &name);
-    QString getResXmlFilePath(void) const;
 
     //不实现iLoadSave
     virtual int load(iLoadSaveProcessor *processor){return 0;}
@@ -141,11 +139,14 @@ public:
     virtual int transactionEnd();
     virtual int loadFile(const QString& fileName = NULL);
     virtual int saveFile(const QString& fileName = NULL);
-    inline void setPassWord(const QString& pswd){
+    virtual void setPassWord(const QString& pswd){
         _password = pswd;
         delete _aes;
         _aes = new QAesWrap(_password.toUtf8(), _salt.toUtf8(), QAesWrap::AES_256);
     }
+
+    void    setResXmlFilePath(const QString &name);
+    QString getResXmlFilePath(void) const;
 
 private:
 

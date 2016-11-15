@@ -23,12 +23,15 @@ public:
     virtual int createNewInstance(const QString& ObjType, const QString& InstID) =0;
     virtual int moveBackToParent() =0;
 
-    //实施保存工作流程：a、启动事务(transactionStart) b、顶层实例顺序调用每个子实例的保存函数 c、子实例顺序调更下级的子实例保存函数 d、所有保存完毕后，顶层实例调用保存文件（saveFile） e、结束事务（transactionEnd）
+    //实施保存工作流程：a、启动(事务transactionStart) b、顶层实例顺序调用每个子实例的保存函数 c、子实例顺序调更下级的子实例保存函数 d、所有保存完毕后，顶层实例调用保存文件（saveFile） e、结束事务（transactionEnd）
     //实施读取工作流程：a、启动事务(transactionStart) b、顶层实例调用读取文件（loadFile），可以是默认文件，也可以指定文件 c、顶层实例顺序调用每个子实例的读取函数 d、子实例顺序调更下级的子实例读取函数  e、结束事务（transactionEnd）
     virtual int transactionStart() =0;
     virtual int transactionEnd() =0;
     virtual int loadFile(const QString& fileName = NULL) =0;
     virtual int saveFile(const QString& fileName = NULL) =0;
+
+    //修改获取保存密码
+    virtual void setPassWord(QString pswd) = 0;
 
 };
 
