@@ -6,12 +6,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    processor = new loadSaveProcessorJson(this,false);
+    processor = new loadSaveProcessorXml(this,false);
     manager = new managerExample(this);
 
-    connect(processor,SIGNAL(msgStateChanged(quint64)),this,SLOT(setState(quint64)));
-    connect(processor,SIGNAL(msgErrorSet(quint64)),this,SLOT(setState(quint64)));
-    connect(processor,SIGNAL(msgErrorReset(quint64)),this,SLOT(setState(quint64)));
+//    connect(processor,SIGNAL(msgStateChanged(quint64)),this,SLOT(setState(quint64)));
+//    connect(processor,SIGNAL(msgErrorSet(quint64)),this,SLOT(setState(quint64)));
+//    connect(processor,SIGNAL(msgErrorReset(quint64)),this,SLOT(setState(quint64)));
     setState(0);
     updateDisplay();
 }
@@ -30,7 +30,7 @@ void MainWindow::on_pushButton_clicked()
     if( processor->transactionStart() )
         return;
 
-    processor->createNewInstance( QString("managerExample"), QString::number( 1 ) );
+//    processor->createNewInstance( QString("managerExample"), QString::number( 1 ) );
     processor->moveToInstance(    QString("managerExample"), QString::number( 1 ) );
     manager->save(processor);
     processor->moveBackToParent();
@@ -41,8 +41,8 @@ void MainWindow::on_pushButton_clicked()
 }
 
 void MainWindow::setState(quint64 state){
-    ui->error->setText( processor->getErrorStringList().join(";"));
-    ui->state->setText( processor->getStateString());
+//    ui->error->setText( processor->getErrorStringList().join(";"));
+//    ui->state->setText( processor->getStateString());
 }
 
 void MainWindow::on_PB_load_clicked()

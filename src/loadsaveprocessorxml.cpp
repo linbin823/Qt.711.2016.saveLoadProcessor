@@ -82,7 +82,7 @@ int loadSaveProcessorXml::saveParameters(const QString &paraName, const QString 
         return -1;
     }
     QDomElement temp;
-    int ret = getElement(temp,paraName);//* 返回数值： 成功0，输入参数错误-1，找不到-2
+    int ret = getElement(temp,paraName);//* 返回数值： 成功0，找不到-1
     //qDebug()<<"loadSaveProcessorXml::saveParameters"<<ret;
     //qDebug()<<"loadSaveProcessorXml::saveParameters"<<domElementParentList.size();
     if( ret == 0 ){
@@ -94,14 +94,13 @@ int loadSaveProcessorXml::saveParameters(const QString &paraName, const QString 
         temp.appendChild( newOne );
         return 0;
     }
-    else if(ret == -2){
+    else if(ret == -1){
         QDomElement newElement  = _resXml.createElement( paraName );
         QDomText    newOne      = _resXml.createTextNode( paraValue );
         newElement.appendChild( newOne );
         getParent().appendChild( newElement );
-        return 0;
+        return 0;//找不到,create new one
     }
-    else return -1;
 }
 
 /*
@@ -110,29 +109,39 @@ int loadSaveProcessorXml::saveParameters(const QString &paraName, const QString 
  * 1、ObjType 一般为类的名字
  * 2、Index 实例的序号，从0开始
  * 返回数值：
- * 1、成功0，状态错误-1，找不到对象-2
+ * 1、成功0，状态错误-1
  * 功能描述：
  * 1、子实例读取流程：a、移动到实例（MoveToInstance） b、读取参数（loadParameters） c、返回父实例（MoveBackToParent）
+ * 20161120优化，子实例写入流程可以简化：
+ * 2、子实例写入流程：a、移动到实例（MoveToInstance） c、写入参数（saveParameters） d、返回父实例（MoveBackToParent）
  */
 int loadSaveProcessorXml::moveToInstance(const QString &ObjType, const QString &index){
     if(getState() != stateOccupied ){
         return -1;
     }
     QDomNodeList newList = getParent().elementsByTagName(ObjType);
-    if(newList.isEmpty()){
-        return -2;
-    }
-    if(index.isNull()){
-        pushParent(newList.at(0).toElement());
-    }
+//    if(newList.isEmpty()){
+//        return -2;
+//    }
+//    if(index.isNull()){
+//        pushParent(newList.at(0).toElement());
+//    }
     for(int i=0; i<newList.size(); i++){
         QDomElement newone = newList.at(i).toElement();
-        if( newone.attribute("id") == index){
+        if(index.isNull()){
+            pushParent(newone);
+            return 0;
+        }
+        else if( newone.attribute("id") == index){
             pushParent(newone);
             return 0;
         }
     }
-    return -2;
+    //找不到，建新再压栈
+    QDomElement newone;
+    setElement(newone, ObjType, index);
+    pushParent( newone );
+    return 0;
 }
 /*
  * 创建新实例
@@ -140,19 +149,18 @@ int loadSaveProcessorXml::moveToInstance(const QString &ObjType, const QString &
  * 1、ObjType 一般为类的名字
  * 2、InstID实例标识符，一般为实例的名称
  * 返回数值：
- * 1、成功0，状态错误-1，数据错误-2
+ * 1、new 0，existed! 1, 状态错误-1
  * 功能描述：
  * 1、子实例写入流程：a、创建新实例（CreateNewInstance）b、移动到实例（MoveToInstance） c、写入参数（saveParameters） d、返回父实例（MoveBackToParent）
+ * 20161120优化，子实例写入流程可以简化：
+ * 2、子实例写入流程：a、移动到实例（MoveToInstance） c、写入参数（saveParameters） d、返回父实例（MoveBackToParent）
  */
 int loadSaveProcessorXml::createNewInstance(const QString &ObjType, const QString &InstID){
     if(getState() != stateOccupied ){
         return -1;
     }
     QDomElement newone;
-    if( setElement(newone, ObjType, InstID) >= 0){//成功0，已存在1，输入参数错误-1，
-        return -2;
-    }
-    return 0;
+    return setElement(newone, ObjType, InstID);
 }
 
 /*
@@ -326,14 +334,10 @@ int loadSaveProcessorXml::writeXmlFile(){
  * 2、QString 被搜索元素的tagName
  * 3、QString 被搜索元素的id，可以不指定
  * 返回数值：
- * 1、成功0，输入参数错误-1，找不到-2
+ * 1、成功0，找不到-1
  * 功能描述：
  */
 int loadSaveProcessorXml::getElement(QDomElement& res, QString tagName, QString id){
-    if (_domElementParentList.size() ==0 || _resXml.isNull() ){
-        res = getParent();
-        return -1;
-    }
     QDomNodeList selection = getParent().elementsByTagName(tagName);
     if(!selection.isEmpty()){
         if(id.isNull() ){
@@ -348,17 +352,17 @@ int loadSaveProcessorXml::getElement(QDomElement& res, QString tagName, QString 
         }
     }
     res = getParent();
-    return -2;
+    return -1;
 }
 
 /*
  * 新增xml元素
  * 输入参数：
- * 1、QDomElement 返回该xml元素的指针，
+ * 1、QDomElement 返回new xml元素的reference
  * 2、QString 新元素的tagName
  * 3、QString 新元素的id，可以不指定
  * 返回数值：
- * 1、成功0，已存在1，输入参数错误-1，
+ * 1、成功0，已存在1
  * 功能描述：
  * 1、在搜索范围内搜索
  * 2、若该元素存在，则直接返回
@@ -366,15 +370,11 @@ int loadSaveProcessorXml::getElement(QDomElement& res, QString tagName, QString 
  * 4、元素id可以不指定，此时返回tagName相同的第一个元素
  */
 int loadSaveProcessorXml::setElement(QDomElement& res, QString tagName, QString id){
-    if (_domElementParentList.size() == 0 || _resXml.isNull() ){
-        res = getParent();
-        return -1;
-    }
     QDomNodeList selection = getParent().elementsByTagName(tagName);
     if( !selection.isEmpty() ){
         if( id.isNull() ){
             res = selection.at(0).toElement();
-            return 0;
+            return 1;//已存在，不新建
         }
         for(int i=0; i<selection.count(); i++){
             if( id == selection.at(i).toElement().attribute("id") ){
@@ -467,8 +467,11 @@ int loadSaveProcessorXml::saveFile(const QString& fileName){
 int loadSaveProcessorXml::transactionStart(){
     if(getState() != stateReady) return -1;
     setState( stateOccupied );
+    _resXml.clear();
+    QDomElement root = _resXml.createElement("root");
+    _resXml.appendChild( root );
     _domElementParentList.clear();
-    _domElementParentList.append( _resXml.firstChildElement() );
+    _domElementParentList.append( root );
     return 0;
 }
 /*

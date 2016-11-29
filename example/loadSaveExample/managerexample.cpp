@@ -40,8 +40,8 @@ int managerExample::save(iLoadSaveProcessor *processor){
     processor->saveParameters( QString("para3"), QString::number( para3 ) );
     int ret;
     for(int i=0; i<=5; i++){
-        ret = processor->createNewInstance( QString("deviceExample") , QString::number( i ) );
-        if(ret < 0) continue;
+//        ret = processor->createNewInstance( QString("deviceExample") , QString::number( i ) );
+//        if(ret < 0) continue;
         ret = processor->moveToInstance(    QString("deviceExample") , QString::number( i ) );
         if(ret < 0) continue;
         ret = pDeviceList.at(i)->save( processor );

@@ -16,6 +16,8 @@ public:
     virtual int saveParameters(const QString& paraName, const QString& paraValue) = 0;
 
     //子实例读取流程：a、移动到实例（MoveToInstance） b、读取参数（loadParameters） c、返回父实例（MoveBackToParent）
+        //20161120优化，子实例写入流程可以简化：
+        //a、移动到实例（MoveToInstance） c、写入参数（saveParameters） d、返回父实例（MoveBackToParent）
     //子实例写入流程：a、创建新实例（CreateNewInstance）b、移动到实例（MoveToInstance） c、写入参数（saveParameters） d、返回父实例（MoveBackToParent）
     //参数1：ObjType 一般为类的名字
     //参数2：InstID实例标识符，一般为实例的序号
@@ -31,7 +33,7 @@ public:
     virtual int saveFile(const QString& fileName = NULL) =0;
 
     //修改获取保存密码
-    virtual void setPassWord(QString pswd) = 0;
+    virtual void setPassWord(const QString& pswd) = 0;
 
 };
 

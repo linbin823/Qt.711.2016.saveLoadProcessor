@@ -27,7 +27,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    loadSaveProcessorJson* processor;
+    iLoadSaveProcessor* processor;
     managerExample* manager;
 
 };
