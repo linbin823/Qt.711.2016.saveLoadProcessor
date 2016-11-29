@@ -109,13 +109,13 @@ int loadSaveProcessorJson::moveToInstance(const QString& ObjType, const QString&
     }
     QString name = ObjType + InstID;
 //    qDebug()<<"loadSaveProcessorJson::moveToInstance-before"<<getPathName()<<getParent()->keys();
-    int ret = pushParent( name );
+    pushParent( name );
 //    qDebug()<<"loadSaveProcessorJson::moveToInstance-after"<<getPathName()<<getParent()->keys();
-    return ret;
+    return 0;
 }
 
 /*
- * 创建新实例
+ * 创建新实例(废弃)
  * 输入参数：
  * 1、ObjType 一般为类的名字
  * 2、InstID实例标识符，一般为实例的名称
@@ -123,6 +123,8 @@ int loadSaveProcessorJson::moveToInstance(const QString& ObjType, const QString&
  * 1、成功0，状态错误-1
  * 功能描述：
  * 1、子实例写入流程：a、创建新实例（CreateNewInstance）b、移动到实例（MoveToInstance） c、写入参数（saveParameters） d、返回父实例（MoveBackToParent）
+ * new routine update,20161129
+ * 1、子实例读取流程：a、移动到实例（MoveToInstance） b、读取参数（loadParameters） c、返回父实例（MoveBackToParent）
  */
 int loadSaveProcessorJson::createNewInstance(const QString &ObjType, const QString &InstID){
     if(getState() != stateOccupied ){
@@ -424,9 +426,10 @@ int loadSaveProcessorJson::popParent(){
 /*
  * parent堆压入
  * 输入参数：参数名称
- * 返回：0成功、-1原来的堆顶元素中含有该参数名称，且该参数不是Object
+ * 返回：0成功
  * 功能描述：
  * 1、把参数名称所对应的object压入parent堆
+ * 2、不是对象,overwrite it
  */
 int loadSaveProcessorJson::pushParent(QString name){
     QJsonValue temp = getParent()->value( name );
@@ -447,7 +450,7 @@ int loadSaveProcessorJson::pushParent(QString name){
         return 0;
     }
 }
-
+//obsolete
 void loadSaveProcessorJson::debugPrint(QJsonObject* obj){
     QJsonObject::Iterator it;
     qDebug()<<"-------------debugPrint Start";

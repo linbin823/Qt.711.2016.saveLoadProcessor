@@ -94,7 +94,7 @@ int loadSaveProcessorXml::saveParameters(const QString &paraName, const QString 
         temp.appendChild( newOne );
         return 0;
     }
-    else if(ret == -1){
+    else{
         QDomElement newElement  = _resXml.createElement( paraName );
         QDomText    newOne      = _resXml.createTextNode( paraValue );
         newElement.appendChild( newOne );
@@ -144,7 +144,7 @@ int loadSaveProcessorXml::moveToInstance(const QString &ObjType, const QString &
     return 0;
 }
 /*
- * 创建新实例
+ * 创建新实例(废弃)
  * 输入参数：
  * 1、ObjType 一般为类的名字
  * 2、InstID实例标识符，一般为实例的名称
@@ -181,7 +181,7 @@ int loadSaveProcessorXml::moveBackToParent(){
 }
 
 /*
- * 初始化xml文件
+ * 初始化xml文件(废弃)
  * 输入参数：无
  * 返回数值：
  * 1、成功0，失败-1
@@ -216,7 +216,7 @@ int loadSaveProcessorXml::initXmlFile(){
  * 读取xml文件
  * 输入参数：无
  * 返回数值：
- * 1、成功0，失败-1，内容错误-2
+ * 1、成功0，失败-1
  * 功能描述：
  * 1、判断文件是已存在且正确，否则失败。
  * 2、读取文件到DOM对象
@@ -231,12 +231,15 @@ int loadSaveProcessorXml::readXmlFile(){
     QFile file(_resXmlFilePathWithoutProtocol);
     if( !file.exists()) {
         setError( errorFileNotFound );
-        if (initXmlFile() != 0){
-            setError( errorFileOpenFail );
-            //qDebug()<<"loadSaveProcessorXml::readXmlFile"<<"errorFileOpenFail";
-            setState( stateNotReady );//进入停止模式
-            return -1;
-        }
+//        20161120优化，取消初始化文件功能
+//        if (initXmlFile() != 0){
+//            setError( errorFileOpenFail );
+//            //qDebug()<<"loadSaveProcessorXml::readXmlFile"<<"errorFileOpenFail";
+//            setState( stateNotReady );//进入停止模式
+//            return -1;
+//        }
+        setState( stateNotReady );//进入停止模式
+        return -1;
     }
     if(!file.open(QIODevice::ReadOnly)){
         //qDebug()<<"loadSaveProcessorXml::readXmlFile"<<"xml file open failed!\n"<<file.errorString();
@@ -255,20 +258,21 @@ int loadSaveProcessorXml::readXmlFile(){
     file.close();
 
     bool ok;
+    QString errMsg;
     if(_needEncrypt){
         QByteArray decrypedBytes = _aes->decrypt(orientalBytes,QAesWrap::AES_ECB);
         //qDebug()<<"loadSaveProcessorXml::readXmlFile"<<orientalBytes<<"||"<<decrypedBytes;
         //qDebug()<<orientalBytes.length()<<decrypedBytes.length();
-        ok = _resXml.setContent(decrypedBytes);
+        ok = _resXml.setContent(decrypedBytes,false,&errMsg);
     }
     else{
-        ok = _resXml.setContent(orientalBytes);
+        ok = _resXml.setContent(orientalBytes,false,&errMsg);
     }
     if(!ok){
         setError( errorFlieFomatWrong );
         file.close();
         setState( stateNotReady );//进入停止模式
-        return -2;
+        return -1;
     }
 
     //qDebug()<<"loadSaveProcessorXml::readXmlFile"<<resXml.firstChildElement().nodeName();
