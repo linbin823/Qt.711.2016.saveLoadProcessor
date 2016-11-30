@@ -8,7 +8,7 @@ class iLoadSaveProcessor
 {
 public:
     iLoadSaveProcessor(){}
-
+    virtual ~iLoadSaveProcessor(){}//多态的析构函数必须是virtual的
     //读写实例内的参数
     //参数1：读：传入参数的名称 写：传入参数的名称
     //参数2：读：返回参数值   写：传入参数值

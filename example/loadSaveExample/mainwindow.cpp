@@ -18,6 +18,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    delete processor;
+    delete manager;
     delete ui;
 }
 
