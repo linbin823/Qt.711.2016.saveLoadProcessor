@@ -129,6 +129,7 @@ public:
 
     virtual int loadParameters(const QString& paraName, QString *paraValue);
     virtual int saveParameters(const QString& paraName, const QString& paraValue);
+
     virtual int moveToInstance(const QString& ObjType, const QString& InstID);
     virtual int createNewInstance(const QString& ObjType, const QString& InstID);
     virtual int moveBackToParent();
@@ -141,7 +142,7 @@ public:
     virtual int transactionEnd();
     virtual int loadFile(const QString& fileName = QString::null);
     virtual int saveFile(const QString& fileName = QString::null);
-    virtual void setPassWord(QString pswd){
+    virtual void setPassWord(const QString& pswd){
         _password = pswd;
         delete _aes;
         _aes = new QAesWrap(_password.toUtf8(), _salt.toUtf8(), QAesWrap::AES_256);
